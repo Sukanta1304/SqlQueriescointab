@@ -60,20 +60,23 @@ userRouter.get("/",async(req,res)=>{
 });
 
 userRouter.post("/add",(req,res)=>{
-    const [data]= req.body;
+    const data= req.body;
     dbconnect.getConnection(async(err,connection)=>{
         if(err){
             console.log(err);
         }else{
-            const query= await connection.query(`INSERT INTO userTable SET ?`,[data],(err,resp)=>{
+            const q= "INSERT INTO userTable (name,dob,gender,email,username,password,phone,profilepic) VALUES ?";
+            var values = [data.map((el)=>[el.name,el.dob,el.gender,el.email,el.username,el.password,el.phone,el.profilepic])];
+            const query= await connection.query(q,values,(err,resp)=>{
                 if(err){
-                    console.log(err)
+                    console.log(err);
+
                  }else{
                     connection.release();
                     res.status(200).send(` Insert successfull!!`)
                  }   
             })
-        }
+        }  
     })
 })
 

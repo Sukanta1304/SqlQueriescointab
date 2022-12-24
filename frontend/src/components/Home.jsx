@@ -7,6 +7,7 @@ import axios from 'axios';
 export default function Home() {
   const url= import.meta.env.VITE_APP_BACKEND_URL;
     const [state, setState] = React.useState([]);
+    const [posteddata,setPostedData] = React.useState([]);
     const [flag,setFlag] = React.useState(true);
     const storeData=[];
     // React.useEffect(() => {
@@ -39,6 +40,13 @@ export default function Home() {
   .then((res)=>{
       // console.log(res);
       setState(res.data.results);
+      state.map((el)=>{
+        const {name,dob,gender,email,login,phone,picture}=el;
+        const crname= name.title+" "+ name.first+" "+ name.last
+        storeData.push({name:crname,dob:dob.date,gender,email,username:login.username,
+                        password:login.password,phone,profilepic:picture.medium});
+      });
+      postData(storeData);
       setFlag(true);
     console.log(flag)
   })
@@ -74,10 +82,21 @@ export default function Home() {
       storeData.push({name:crname,dob:dob.date,gender,email,username:login.username,
                       password:login.password,phone,profilepic:picture.medium});
     });
-    console.log(storeData);
     }, [state])
 
-    
+    const postData=async(data)=>{
+      if(storeData.length>0){
+        await axios.post(`${url}/users/add`,data)
+        .then((res)=>{
+          console.log(res)
+        })
+        .catch((err)=>{
+          console.log(err);
+        })
+      }else{
+        console.log("can't post empty data")
+      }
+    }
 
   return (
     <div>
